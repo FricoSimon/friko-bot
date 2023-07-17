@@ -20,6 +20,7 @@ client.on('messageCreate', (message) => {
     console.log(`${message.content} sent by ${message.author.username}`);
 });
 
+// main function
 async function main() {
     const commands = [
         {
@@ -30,6 +31,23 @@ async function main() {
             name: 'owner',
             description: 'Who is the owner of this bot?',
         },
+        {
+            name: 'register',
+            description: 'Register yourself as a student/alumni of SI ITHB.',
+            options: [
+                {
+                    name: 'name',
+                    description: 'Your name',
+                    type: 3,
+                    required: true,
+                },
+                {
+                    name: 'nim',
+                    description: 'Your NIM',
+                    type: 4,
+                    required: true,
+                }],
+        }
     ];
 
     try {
@@ -42,15 +60,20 @@ async function main() {
     }
 }
 
+// listen for interactions
 client.on('interactionCreate', async interaction => {
     if (!interaction.isChatInputCommand()) return;
 
     if (interaction.commandName === 'ping') {
         await interaction.reply('Pong!');
     } else if (interaction.commandName === 'owner') {
-        await interaction
         await interaction.reply('My owner is <@!177711122571329537>\nFollow him on LinkedIn: https://www.linkedin.com/in/fricosimon/'); await interaction.reply('My owner is <@!177711122571329537>\nFollow him on LinkedIn: https://www.linkedin.com/in/fricosimon/');
+    } else if (interaction.commandName === 'register') {
+        const name = interaction.options.getString('name');
+        const nim = interaction.options.getInteger('nim');
+        await interaction.reply(`Hi ${nim} - ${name}! You have been registered as a student/alumni of SI ITHB.`);
     }
 });
 
+// Start the bot
 main();
