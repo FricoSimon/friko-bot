@@ -3,6 +3,7 @@ import { REST } from 'discord.js';
 import dotenv from 'dotenv';
 import registerCommand from './commands/register.js';
 import ownerCommand from './commands/owner.js';
+import banCommand from './commands/ban.js';
 dotenv.config();
 
 const client = new Client({
@@ -31,7 +32,8 @@ async function main() {
             description: 'Replies with Pong! The other command is deprecated. Do not use it.',
         },
         ownerCommand,
-        registerCommand,];
+        registerCommand,
+        banCommand,];
 
     try {
         console.log('Started refreshing application (/) commands.');
