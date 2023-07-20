@@ -46,9 +46,24 @@ async function main() {
                     description: 'Your NIM',
                     type: 4,
                     required: true,
-                }],
-        }
-    ];
+                },
+                {
+                    name: 'batch',
+                    description: 'Your batch (year)',
+                    type: 4,
+                    required: false,
+                    choices: [
+                        {
+                            name: '2020',
+                            value: 2020,
+                        },
+                        {
+                            name: '2021',
+                            value: 2021,
+                        },],
+                },
+            ]
+        }];
 
     try {
         console.log('Started refreshing application (/) commands.');
@@ -67,11 +82,15 @@ client.on('interactionCreate', async interaction => {
     if (interaction.commandName === 'ping') {
         await interaction.reply('Pong!');
     } else if (interaction.commandName === 'owner') {
-        await interaction.reply('My owner is <@!177711122571329537>\nFollow him on LinkedIn: https://www.linkedin.com/in/fricosimon/'); await interaction.reply('My owner is <@!177711122571329537>\nFollow him on LinkedIn: https://www.linkedin.com/in/fricosimon/');
+        const messageContent = `My owner is <@!177711122571329537>
+Follow him on LinkedIn: https://www.linkedin.com/in/fricosimon/
+Follow him on GitHub: https://github.com/FricoSimon`;
+        await interaction.reply(messageContent);
     } else if (interaction.commandName === 'register') {
         const name = interaction.options.getString('name');
         const nim = interaction.options.getInteger('nim');
-        await interaction.reply(`Hi ${nim} - ${name}! You have been registered as a student/alumni of SI ITHB.`);
+        const batch = interaction.options.getInteger('batch');
+        await interaction.reply(`Hi ${nim} - ${name}! You have been registered as a student/alumni of SI ITHB ${batch}.`);
     }
 });
 
