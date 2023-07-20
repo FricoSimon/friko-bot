@@ -1,6 +1,8 @@
 import { Client, GatewayIntentBits, Routes } from 'discord.js';
 import { REST } from 'discord.js';
 import dotenv from 'dotenv';
+import registerCommand from './commands/register.js';
+import ownerCommand from './commands/owner.js';
 dotenv.config();
 
 const client = new Client({
@@ -20,6 +22,7 @@ client.on('messageCreate', (message) => {
     console.log(`${message.content} sent by ${message.author.username}`);
 });
 
+
 // main function
 async function main() {
     const commands = [
@@ -27,43 +30,8 @@ async function main() {
             name: 'ping',
             description: 'Replies with Pong! The other command is deprecated. Do not use it.',
         },
-        {
-            name: 'owner',
-            description: 'Who is the owner of this bot?',
-        },
-        {
-            name: 'register',
-            description: 'Register yourself as a student/alumni of SI ITHB.',
-            options: [
-                {
-                    name: 'name',
-                    description: 'Your name',
-                    type: 3,
-                    required: true,
-                },
-                {
-                    name: 'nim',
-                    description: 'Your NIM',
-                    type: 4,
-                    required: true,
-                },
-                {
-                    name: 'batch',
-                    description: 'Your batch (year)',
-                    type: 4,
-                    required: false,
-                    choices: [
-                        {
-                            name: '2020',
-                            value: 2020,
-                        },
-                        {
-                            name: '2021',
-                            value: 2021,
-                        },],
-                },
-            ]
-        }];
+        ownerCommand,
+        registerCommand,];
 
     try {
         console.log('Started refreshing application (/) commands.');
