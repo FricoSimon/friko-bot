@@ -1,9 +1,11 @@
-import { Client, GatewayIntentBits, Routes } from 'discord.js';
+import { ActionRowBuilder, Client, GatewayIntentBits, Routes } from 'discord.js';
 import { REST } from 'discord.js';
 import dotenv from 'dotenv';
 import registerCommand from './commands/register.js';
 import ownerCommand from './commands/owner.js';
 import banCommand from './commands/ban.js';
+import semesterCommand from './commands/semester.js';
+import { SelectMenuBuilder } from '@discordjs/builders';
 dotenv.config();
 
 const client = new Client({
@@ -27,13 +29,10 @@ client.on('messageCreate', (message) => {
 // main function
 async function main() {
     const commands = [
-        {
-            name: 'ping',
-            description: 'Replies with Pong! The other command is deprecated. Do not use it.',
-        },
         ownerCommand,
         registerCommand,
-        banCommand,];
+        banCommand,
+        semesterCommand];
 
     try {
         console.log('Started refreshing application (/) commands.');
@@ -61,6 +60,15 @@ Follow him on GitHub: https://github.com/FricoSimon`;
         const nim = interaction.options.getInteger('nim');
         const batch = interaction.options.getInteger('batch');
         await interaction.reply(`Hi ${nim} - ${name}! You have been registered as a student/alumni of SI ITHB ${batch}.`);
+    } else if (interaction.commandName === 'semester') {
+        const actionRow = new ActionRowBuilder().addComponents(
+            new SelectMenuBuilder().setCustomId('semester_options').setOptions(
+                { label: 'Semester 1', value: '1' },
+                { label: 'Semester 2', value: '2' },
+                { label: 'Semester 3', value: '3' },
+                { label: 'Semester 4', value: '4' }
+            ));
+        await interaction.reply({ components: [actionRow] });
     }
 });
 
