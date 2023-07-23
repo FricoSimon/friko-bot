@@ -5,7 +5,9 @@ import {
     ModalBuilder,
     Routes,
     TextInputBuilder,
-    TextInputStyle
+    TextInputStyle,
+    ButtonBuilder,
+    ButtonStyle,
 } from 'discord.js';
 import { REST } from 'discord.js';
 import dotenv from 'dotenv';
@@ -13,14 +15,16 @@ import * as command from './commands/index.js';
 import { SelectMenuBuilder } from '@discordjs/builders';
 dotenv.config();
 
+// Create a new client instance
 const client = new Client({
     intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.Guilds, // required for guild-based events
+        GatewayIntentBits.GuildMessages, // required for message-based events
         GatewayIntentBits.MessageContent,
     ],
 });
 
+// Create a new REST client
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
 // Log when bot is ready
@@ -35,6 +39,7 @@ client.on('messageCreate', (message) => {
 
 // main function
 async function main() {
+    // register slash commands
     const commands = [
         command.ownerCommand,
         command.registerCommand,
@@ -62,10 +67,21 @@ client.on('interactionCreate', async (interaction) => {
     if (interaction.commandName === 'ping') {
         await interaction.reply('Pong!');
     } else if (interaction.commandName === 'owner') {
-        const messageContent = `My owner is <@!177711122571329537>
-Follow him on LinkedIn: https://www.linkedin.com/in/fricosimon/
-Follow him on GitHub: https://github.com/FricoSimon`;
-        await interaction.reply(messageContent);
+        await interaction.reply({
+            content: 'My owner is <@!177711122571329537>',
+            components: [
+                new ActionRowBuilder().addComponents(
+                    new ButtonBuilder()
+                        .setLabel('LinkedIn')
+                        .setStyle(ButtonStyle.Link)
+                        .setURL('https://www.linkedin.com/in/fricosimon/'),
+                    new ButtonBuilder()
+                        .setLabel('GitHub')
+                        .setStyle(ButtonStyle.Link)
+                        .setURL('https://github.com/FricoSimon')
+                ),
+            ],
+        });
     } else if (interaction.commandName === 'register') {
         const name = interaction.options.getString('name');
         const nim = interaction.options.getInteger('nim');
@@ -128,6 +144,4 @@ client.on('interactionCreate', async (interaction) => {
     }
 });
 
-
-// Start the bot
 main();
