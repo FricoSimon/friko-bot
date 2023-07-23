@@ -1,4 +1,4 @@
-import { ActionRowBuilder, Client, GatewayIntentBits, Routes } from 'discord.js';
+import { ActionRowBuilder, Client, GatewayIntentBits, ModalBuilder, Routes, TextInputBuilder, TextInputStyle } from 'discord.js';
 import { REST } from 'discord.js';
 import dotenv from 'dotenv';
 import * as command from './commands/index.js';
@@ -28,7 +28,8 @@ async function main() {
         command.ownerCommand,
         command.registerCommand,
         command.banCommand,
-        command.semesterCommand];
+        command.semesterCommand,
+        command.loginCommand];
 
     try {
         console.log('Started refreshing application (/) commands.');
@@ -65,6 +66,32 @@ Follow him on GitHub: https://github.com/FricoSimon`;
                 { label: 'Semester 4', value: '4' }
             ));
         await interaction.reply({ components: [actionRow] });
+    } else if (interaction.commandName === 'login') {
+        const modal = new ModalBuilder()
+            .setTitle('Login')
+            .setCustomId('login_modal')
+            .setComponents(
+                new ActionRowBuilder().addComponents(
+                    new TextInputBuilder()
+                        .setLabel('NIM')
+                        .setCustomId('NIM')
+                        .setStyle(TextInputStyle.Short)
+                ),
+                new ActionRowBuilder().addComponents(
+                    new TextInputBuilder()
+                        .setLabel('password')
+                        .setCustomId('password')
+                        .setStyle(TextInputStyle.Short)
+                ),
+                new ActionRowBuilder().addComponents(
+                    new TextInputBuilder()
+                        .setLabel('note')
+                        .setCustomId('note')
+                        .setStyle(TextInputStyle.Paragraph)
+                ),
+            )
+
+        interaction.showModal(modal);
     }
 });
 
