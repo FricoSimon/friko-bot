@@ -1,4 +1,12 @@
-import { ActionRowBuilder, Client, GatewayIntentBits, ModalBuilder, Routes, TextInputBuilder, TextInputStyle } from 'discord.js';
+import {
+    ActionRowBuilder,
+    Client,
+    GatewayIntentBits,
+    ModalBuilder,
+    Routes,
+    TextInputBuilder,
+    TextInputStyle
+} from 'discord.js';
 import { REST } from 'discord.js';
 import dotenv from 'dotenv';
 import * as command from './commands/index.js';
@@ -6,16 +14,19 @@ import { SelectMenuBuilder } from '@discordjs/builders';
 dotenv.config();
 
 const client = new Client({
-    intents: [GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-    ]
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
+    ],
 });
 
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
 // Log when bot is ready
-client.on('ready', () => { console.log(`Logged in as ${client.user.tag} successfully!`); });
+client.on('ready', () => {
+    console.log(`Logged in as ${client.user.tag} successfully!`);
+});
 
 // Log messages to console
 client.on('messageCreate', (message) => {
@@ -29,20 +40,23 @@ async function main() {
         command.registerCommand,
         command.banCommand,
         command.semesterCommand,
-        command.loginCommand];
+        command.loginCommand,
+    ];
 
     try {
         console.log('Started refreshing application (/) commands.');
-        await rest.put(Routes.applicationCommands(process.env.CLIENT_ID, process.env.GUILD_ID), { body: commands });
+        await rest.put(
+            Routes.applicationCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
+            { body: commands }
+        );
         client.login(process.env.TOKEN);
-    }
-    catch (error) {
+    } catch (error) {
         console.log(error);
     }
 }
 
 // listen for interactions
-client.on('interactionCreate', async interaction => {
+client.on('interactionCreate', async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
 
     if (interaction.commandName === 'ping') {
@@ -56,7 +70,9 @@ Follow him on GitHub: https://github.com/FricoSimon`;
         const name = interaction.options.getString('name');
         const nim = interaction.options.getInteger('nim');
         const batch = interaction.options.getInteger('batch');
-        await interaction.reply(`Hi ${nim} - ${name}! You have been registered as a student/alumni of SI ITHB ${batch}.`);
+        await interaction.reply(
+            `Hi ${nim} - ${name}! You have been registered as a student/alumni of SI ITHB ${batch}.`
+        );
     } else if (interaction.commandName === 'semester') {
         const actionRow = new ActionRowBuilder().addComponents(
             new SelectMenuBuilder().setCustomId('semester_options').setOptions(
@@ -64,7 +80,8 @@ Follow him on GitHub: https://github.com/FricoSimon`;
                 { label: 'Semester 2', value: '2' },
                 { label: 'Semester 3', value: '3' },
                 { label: 'Semester 4', value: '4' }
-            ));
+            )
+        );
         await interaction.reply({ components: [actionRow] });
     } else if (interaction.commandName === 'login') {
         const modal = new ModalBuilder()
@@ -88,12 +105,29 @@ Follow him on GitHub: https://github.com/FricoSimon`;
                         .setLabel('note')
                         .setCustomId('note')
                         .setStyle(TextInputStyle.Paragraph)
-                ),
-            )
+                )
+            );
 
-        interaction.showModal(modal);
+        await interaction.showModal(modal);
     }
 });
+
+// listen for modal submissions
+client.on('interactionCreate', async (interaction) => {
+    if (!interaction.isModalSubmit()) return;
+
+    if (interaction.customId === 'login_modal') {
+        const nim = interaction.fields.getTextInputValue('NIM');
+        const password = interaction.fields.getTextInputValue('password');
+        const note = interaction.fields.getTextInputValue('note');
+        await interaction.reply({
+            content: `NIM: ${nim}\nPassword: ${password}\nNote: ${note}`,
+            ephemeral: true
+        });
+
+    }
+});
+
 
 // Start the bot
 main();
