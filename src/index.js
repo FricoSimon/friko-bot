@@ -1,10 +1,7 @@
 import { ActionRowBuilder, Client, GatewayIntentBits, Routes } from 'discord.js';
 import { REST } from 'discord.js';
 import dotenv from 'dotenv';
-import registerCommand from './commands/register.js';
-import ownerCommand from './commands/owner.js';
-import banCommand from './commands/ban.js';
-import semesterCommand from './commands/semester.js';
+import * as command from './commands/index.js';
 import { SelectMenuBuilder } from '@discordjs/builders';
 dotenv.config();
 
@@ -25,14 +22,13 @@ client.on('messageCreate', (message) => {
     console.log(`${message.content} sent by ${message.author.username}`);
 });
 
-
 // main function
 async function main() {
     const commands = [
-        ownerCommand,
-        registerCommand,
-        banCommand,
-        semesterCommand];
+        command.ownerCommand,
+        command.registerCommand,
+        command.banCommand,
+        command.semesterCommand];
 
     try {
         console.log('Started refreshing application (/) commands.');
