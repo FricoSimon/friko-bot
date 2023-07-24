@@ -70,87 +70,89 @@ async function main() {
 client.on('interactionCreate', async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
 
-    if (interaction.commandName === 'owner') {
-        await interaction.reply({
-            content: 'My owner is <@!177711122571329537>',
-            components: [
-                new ActionRowBuilder().addComponents(
-                    new ButtonBuilder()
-                        .setLabel('LinkedIn')
-                        .setStyle(ButtonStyle.Link)
-                        .setURL('https://www.linkedin.com/in/fricosimon/'),
-                    new ButtonBuilder()
-                        .setLabel('GitHub')
-                        .setStyle(ButtonStyle.Link)
-                        .setURL('https://github.com/FricoSimon'),
-                    new ButtonBuilder()
-                        .setCustomId('testing button')
-                        .setLabel('GitHub')
-                        .setStyle(ButtonStyle.Secondary)
-                ),
-            ],
-        });
-    } else if (interaction.commandName === 'register') {
-        const name = interaction.options.getString('name');
-        const nim = interaction.options.getInteger('nim');
-        const batch = interaction.options.getInteger('batch');
-        await interaction.reply(
-            `Hi ${nim} - ${name}! You have been registered as a student/alumni of SI ITHB ${batch}.`
-        );
-    } else if (interaction.commandName === 'semester') {
-        const actionRow = new ActionRowBuilder().addComponents(
-            new SelectMenuBuilder().setCustomId('semester_options').setOptions(
-                { label: 'Semester 1', value: '1' },
-                { label: 'Semester 2', value: '2' },
-                { label: 'Semester 3', value: '3' },
-                { label: 'Semester 4', value: '4' }
-            )
-        );
-        await interaction.reply({ components: [actionRow] });
-    } else if (interaction.commandName === 'login') {
-        const modal = new ModalBuilder()
-            .setTitle('Login')
-            .setCustomId('login_modal')
-            .setComponents(
-                new ActionRowBuilder().addComponents(
-                    new TextInputBuilder()
-                        .setLabel('NIM')
-                        .setCustomId('NIM')
-                        .setStyle(TextInputStyle.Short)
-                ),
-                new ActionRowBuilder().addComponents(
-                    new TextInputBuilder()
-                        .setLabel('password')
-                        .setCustomId('password')
-                        .setStyle(TextInputStyle.Short)
-                ),
-                new ActionRowBuilder().addComponents(
-                    new TextInputBuilder()
-                        .setLabel('note')
-                        .setCustomId('note')
-                        .setStyle(TextInputStyle.Paragraph)
+    try {
+        if (interaction.commandName === 'owner') {
+            await interaction.reply({
+                content: 'My owner is <@!177711122571329537>',
+                components: [
+                    new ActionRowBuilder().addComponents(
+                        new ButtonBuilder()
+                            .setLabel('LinkedIn')
+                            .setStyle(ButtonStyle.Link)
+                            .setURL('https://www.linkedin.com/in/fricosimon/'),
+                        new ButtonBuilder()
+                            .setLabel('GitHub')
+                            .setStyle(ButtonStyle.Link)
+                            .setURL('https://github.com/FricoSimon'),
+                        new ButtonBuilder()
+                            .setCustomId('testing button')
+                            .setLabel('GitHub')
+                            .setStyle(ButtonStyle.Secondary)
+                    ),
+                ],
+            });
+        } else if (interaction.commandName === 'register') {
+            const name = interaction.options.getString('name');
+            const nim = interaction.options.getInteger('nim');
+            const batch = interaction.options.getInteger('batch');
+            await interaction.reply(
+                `Hi ${nim} - ${name}! You have been registered as a student/alumni of SI ITHB ${batch}.`
+            );
+        } else if (interaction.commandName === 'semester') {
+            const actionRow = new ActionRowBuilder().addComponents(
+                new SelectMenuBuilder().setCustomId('semester_options').setOptions(
+                    { label: 'Semester 1', value: '1' },
+                    { label: 'Semester 2', value: '2' },
+                    { label: 'Semester 3', value: '3' },
+                    { label: 'Semester 4', value: '4' }
                 )
             );
-
-        await interaction.showModal(modal);
-    } else if (interaction.commandName === 'truthordare') {
-        await interaction.reply({
-            content: 'Choose your destiny!',
-            components: [
-                new ActionRowBuilder().addComponents(
-                    new ButtonBuilder()
-                        .setCustomId('truth')
-                        .setLabel('Truth')
-                        .setStyle(ButtonStyle.Success),
-                    new ButtonBuilder()
-                        .setCustomId('dare')
-                        .setLabel('Dare')
-                        .setStyle(ButtonStyle.Danger)
-                ),
-            ],
-        });
+            await interaction.reply({ components: [actionRow] });
+        } else if (interaction.commandName === 'login') {
+            const modal = new ModalBuilder()
+                .setTitle('Login')
+                .setCustomId('login_modal')
+                .setComponents(
+                    new ActionRowBuilder().addComponents(
+                        new TextInputBuilder()
+                            .setLabel('NIM')
+                            .setCustomId('NIM')
+                            .setStyle(TextInputStyle.Short)
+                    ),
+                    new ActionRowBuilder().addComponents(
+                        new TextInputBuilder()
+                            .setLabel('password')
+                            .setCustomId('password')
+                            .setStyle(TextInputStyle.Short)
+                    ),
+                    new ActionRowBuilder().addComponents(
+                        new TextInputBuilder()
+                            .setLabel('note')
+                            .setCustomId('note')
+                            .setStyle(TextInputStyle.Paragraph)
+                    ));
+            await interaction.showModal(modal);
+        } else if (interaction.commandName === 'truthordare') {
+            await interaction.reply({
+                content: 'Choose your destiny!',
+                components: [
+                    new ActionRowBuilder().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId('truth')
+                            .setLabel('Truth')
+                            .setStyle(ButtonStyle.Success),
+                        new ButtonBuilder()
+                            .setCustomId('dare')
+                            .setLabel('Dare')
+                            .setStyle(ButtonStyle.Danger)
+                    ),
+                ],
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        await interaction.reply({ content: 'Error!' });
     }
-
 });
 
 // listen for modal submissions
@@ -173,54 +175,57 @@ client.on('interactionCreate', async (interaction) => {
 client.on('interactionCreate', async (interaction) => {
     if (!interaction.isButton()) return;
 
-    // truth button handler
-    if (interaction.customId === 'truth') {
-        try {
-            const response = await axios.get('https://api.truthordarebot.xyz/v1/truth');
-            const data = response.data.question;
-            const username = interaction.user.username;
-            const userId = interaction.user.id;
-            const user = userMention(userId);
+    try {
+        // truth button handler
+        if (interaction.customId === 'truth') {
+            try {
+                const response = await axios.get('https://api.truthordarebot.xyz/v1/truth');
+                const data = response.data.question;
+                const username = interaction.user.username;
+                const userId = userMention(interaction.user.id);
 
-            const embedReply = new EmbedBuilder()
-                .setTitle('You chose truth!')
-                .setAuthor({ name: `${username}` })
-                .setDescription('Answer this question honestly:')
-                .setThumbnail('https://i.imgur.com/mKX4m6s.png')
-                .addFields({ name: 'Question', value: `${data}`, inline: true })
-                .setColor('#3ba55c')
-                .setTimestamp();
+                const embedReply = new EmbedBuilder()
+                    .setTitle('You chose truth!')
+                    .setAuthor({ name: `${username}` })
+                    .setDescription('Answer this question honestly:')
+                    .setThumbnail('https://i.imgur.com/mKX4m6s.png')
+                    .addFields({ name: 'Question', value: `${data}`, inline: true })
+                    .setColor('#3ba55c')
+                    .setTimestamp();
 
-            await interaction.reply({ content: `Answer this in 60s!\n${user}`, embeds: [embedReply] });
-        } catch (error) {
-            console.error(error);
-            await interaction.reply({ content: 'Error!' });
+                await interaction.reply({ content: `Answer this in 60s!\n${userId}`, embeds: [embedReply] });
+            } catch (error) {
+                console.error(error);
+                await interaction.reply({ content: 'Error!' });
+            }
         }
-    }
 
-    // dare button handler
-    else if (interaction.customId === 'dare') {
-        try {
-            const response = await axios.get('https://api.truthordarebot.xyz/v1/dare');
-            const data = response.data.question;
-            const username = interaction.user.username;
-            const userId = interaction.user.id;
-            const user = userMention(userId);
+        // dare button handler
+        else if (interaction.customId === 'dare') {
+            try {
+                const response = await axios.get('https://api.truthordarebot.xyz/v1/dare');
+                const data = response.data.question;
+                const username = interaction.user.username;
+                const userId = userMention(interaction.user.id);
 
-            const embedReply = new EmbedBuilder()
-                .setTitle('You chose dare!')
-                .setAuthor({ name: `${username}` })
-                .setDescription('Do this dare:')
-                .setThumbnail('https://i.imgur.com/mKX4m6s.png')
-                .addFields({ name: 'Order', value: `${data}`, inline: true })
-                .setColor('#FF5733')
-                .setTimestamp();
+                const embedReply = new EmbedBuilder()
+                    .setTitle('You chose dare!')
+                    .setAuthor({ name: `${username}` })
+                    .setDescription('Do this dare:')
+                    .setThumbnail('https://i.imgur.com/mKX4m6s.png')
+                    .addFields({ name: 'Order', value: `${data}`, inline: true })
+                    .setColor('#FF5733')
+                    .setTimestamp();
 
-            await interaction.reply({ content: `Do this in 60s!\n${user}`, embeds: [embedReply] });
-        } catch (error) {
-            console.error(error);
-            await interaction.reply({ content: 'Error!' });
+                await interaction.reply({ content: `Do this in 60s!\n${userId}`, embeds: [embedReply] });
+            } catch (error) {
+                console.error(error);
+                await interaction.reply({ content: 'Error!' });
+            }
         }
+    } catch (error) {
+        console.error(error);
+        await interaction.reply({ content: 'Error!' });
     }
 });
 
