@@ -13,7 +13,15 @@ import { REST } from 'discord.js';
 import dotenv from 'dotenv';
 import * as command from './commands/index.js';
 import { SelectMenuBuilder } from '@discordjs/builders';
+import Express from "express";
+import axios from "axios";
+
+const app = new Express();
+const port = 3000;
 dotenv.config();
+
+app.use(Express.json());
+app.use(Express.urlencoded({ extended: true }));
 
 // Create a new client instance
 const client = new Client({
@@ -177,3 +185,7 @@ client.on('interactionCreate', async (interaction) => {
 });
 
 main();
+
+app.listen(port, () => {
+    console.log(`Example app listening at http://localhost:${port}`);
+});
