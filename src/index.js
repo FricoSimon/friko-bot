@@ -42,11 +42,6 @@ client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag} successfully!`);
 });
 
-// Log messages to console
-client.on('messageCreate', (message) => {
-    console.log(`${message.content} sent by ${message.author.username}`);
-});
-
 // main function
 async function main() {
     // register slash commands
@@ -183,6 +178,8 @@ client.on('interactionCreate', async (interaction) => {
             const response = await axios.get('https://api.truthordarebot.xyz/v1/truth');
             const data = response.data.question;
             const username = interaction.user.username;
+            const userId = interaction.user.id;
+            const user = userMention(userId);
 
             const embedReply = new EmbedBuilder()
                 .setTitle('You chose truth!')
@@ -192,7 +189,7 @@ client.on('interactionCreate', async (interaction) => {
                 .addFields({ name: 'Question', value: `${data}`, inline: true })
                 .setColor('#3ba55c');
 
-            await interaction.reply({ embeds: [embedReply] });
+            await interaction.reply({ content: `Answer this in 60s!\n${user}`, embeds: [embedReply] });
         } catch (error) {
             console.error(error);
             await interaction.reply({ content: 'Error!' });
@@ -213,7 +210,7 @@ client.on('interactionCreate', async (interaction) => {
                 .addFields({ name: 'Order', value: `${data}`, inline: true })
                 .setColor('#FF5733');
 
-            await interaction.reply({ content: `Do this in 60s ${user}`, embeds: [embedReply] });
+            await interaction.reply({ content: `Do this in 60s!\n${user}`, embeds: [embedReply] });
         } catch (error) {
             console.error(error);
             await interaction.reply({ content: 'Error!' });
