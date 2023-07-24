@@ -8,6 +8,8 @@ import {
     TextInputStyle,
     ButtonBuilder,
     ButtonStyle,
+    EmbedBuilder,
+    Embed,
 } from 'discord.js';
 import { REST } from 'discord.js';
 import dotenv from 'dotenv';
@@ -176,11 +178,27 @@ client.on('interactionCreate', async (interaction) => {
 client.on('interactionCreate', async (interaction) => {
     if (!interaction.isButton()) return;
 
-    console.log(interaction.customId);
-    if (interaction.customId === 'testing button') {
-        await interaction.reply({
-            content: 'Button clicked!',
-        });
+    if (interaction.customId === 'truth') {
+        try {
+            const response = await axios.get('https://api.truthordarebot.xyz/v1/truth');
+            const data = response.data.question;
+
+            const embedReply = new EmbedBuilder()
+                .setTitle('You chose truth!')
+                .setDescription('Answer this question honestly:')
+                .addFields({ name: 'Question', value: `${data}`, inline: true })
+                .setColor('#3ba55c');
+
+            await interaction.reply({
+                embeds: [embedReply],
+
+            });
+        } catch (error) {
+            console.error(error);
+            await interaction.reply({
+                content: 'Error!',
+            });
+        }
     }
 });
 
