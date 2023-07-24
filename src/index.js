@@ -182,43 +182,39 @@ client.on('interactionCreate', async (interaction) => {
         try {
             const response = await axios.get('https://api.truthordarebot.xyz/v1/truth');
             const data = response.data.question;
+            const username = interaction.user.username;
 
             const embedReply = new EmbedBuilder()
                 .setTitle('You chose truth!')
+                .setAuthor({ name: `${username}` })
                 .setDescription('Answer this question honestly:')
+                .setThumbnail('https://i.imgur.com/mKX4m6s.png')
                 .addFields({ name: 'Question', value: `${data}`, inline: true })
                 .setColor('#3ba55c');
 
-            await interaction.reply({
-                embeds: [embedReply],
-
-            });
+            await interaction.reply({ embeds: [embedReply] });
         } catch (error) {
             console.error(error);
-            await interaction.reply({
-                content: 'Error!',
-            });
+            await interaction.reply({ content: 'Error!' });
         }
     } else if (interaction.customId === 'dare') {
         try {
             const response = await axios.get('https://api.truthordarebot.xyz/v1/dare');
             const data = response.data.question;
+            const username = interaction.user.username;
 
             const embedReply = new EmbedBuilder()
                 .setTitle('You chose dare!')
+                .setAuthor({ name: `${username}` })
                 .setDescription('Do this dare:')
+                .setThumbnail('https://i.imgur.com/mKX4m6s.png')
                 .addFields({ name: 'Order', value: `${data}`, inline: true })
                 .setColor('#FF5733');
 
-            await interaction.reply({
-                embeds: [embedReply],
-
-            });
+            await interaction.reply({ embeds: [embedReply] });
         } catch (error) {
             console.error(error);
-            await interaction.reply({
-                content: 'Error!',
-            });
+            await interaction.reply({ content: 'Error!' });
         }
     }
 });
