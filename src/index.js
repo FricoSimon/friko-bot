@@ -173,6 +173,7 @@ client.on('interactionCreate', async (interaction) => {
 client.on('interactionCreate', async (interaction) => {
     if (!interaction.isButton()) return;
 
+    // truth button handler
     if (interaction.customId === 'truth') {
         try {
             const response = await axios.get('https://api.truthordarebot.xyz/v1/truth');
@@ -187,14 +188,18 @@ client.on('interactionCreate', async (interaction) => {
                 .setDescription('Answer this question honestly:')
                 .setThumbnail('https://i.imgur.com/mKX4m6s.png')
                 .addFields({ name: 'Question', value: `${data}`, inline: true })
-                .setColor('#3ba55c');
+                .setColor('#3ba55c')
+                .setTimestamp();
 
             await interaction.reply({ content: `Answer this in 60s!\n${user}`, embeds: [embedReply] });
         } catch (error) {
             console.error(error);
             await interaction.reply({ content: 'Error!' });
         }
-    } else if (interaction.customId === 'dare') {
+    }
+
+    // dare button handler
+    else if (interaction.customId === 'dare') {
         try {
             const response = await axios.get('https://api.truthordarebot.xyz/v1/dare');
             const data = response.data.question;
@@ -208,7 +213,8 @@ client.on('interactionCreate', async (interaction) => {
                 .setDescription('Do this dare:')
                 .setThumbnail('https://i.imgur.com/mKX4m6s.png')
                 .addFields({ name: 'Order', value: `${data}`, inline: true })
-                .setColor('#FF5733');
+                .setColor('#FF5733')
+                .setTimestamp();
 
             await interaction.reply({ content: `Do this in 60s!\n${user}`, embeds: [embedReply] });
         } catch (error) {
@@ -220,6 +226,4 @@ client.on('interactionCreate', async (interaction) => {
 
 main();
 
-app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
-});
+app.listen(port, () => { console.log(`Example app listening at http://localhost:${port}`); });
