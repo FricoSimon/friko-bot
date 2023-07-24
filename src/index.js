@@ -9,7 +9,7 @@ import {
     ButtonBuilder,
     ButtonStyle,
     EmbedBuilder,
-    Embed,
+    userMention,
 } from 'discord.js';
 import { REST } from 'discord.js';
 import dotenv from 'dotenv';
@@ -202,6 +202,8 @@ client.on('interactionCreate', async (interaction) => {
             const response = await axios.get('https://api.truthordarebot.xyz/v1/dare');
             const data = response.data.question;
             const username = interaction.user.username;
+            const userId = interaction.user.id;
+            const user = userMention(userId);
 
             const embedReply = new EmbedBuilder()
                 .setTitle('You chose dare!')
@@ -211,7 +213,7 @@ client.on('interactionCreate', async (interaction) => {
                 .addFields({ name: 'Order', value: `${data}`, inline: true })
                 .setColor('#FF5733');
 
-            await interaction.reply({ embeds: [embedReply] });
+            await interaction.reply({ content: `Do this in 60s ${user}`, embeds: [embedReply] });
         } catch (error) {
             console.error(error);
             await interaction.reply({ content: 'Error!' });
