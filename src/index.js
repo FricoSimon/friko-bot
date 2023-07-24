@@ -46,6 +46,7 @@ async function main() {
         command.banCommand,
         command.semesterCommand,
         command.loginCommand,
+        command.truthOrDareCommand,
     ];
 
     try {
@@ -60,13 +61,11 @@ async function main() {
     }
 }
 
-// listen for interactions
+// listen for slash commands
 client.on('interactionCreate', async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
 
-    if (interaction.commandName === 'ping') {
-        await interaction.reply('Pong!');
-    } else if (interaction.commandName === 'owner') {
+    if (interaction.commandName === 'owner') {
         await interaction.reply({
             content: 'My owner is <@!177711122571329537>',
             components: [
@@ -78,7 +77,11 @@ client.on('interactionCreate', async (interaction) => {
                     new ButtonBuilder()
                         .setLabel('GitHub')
                         .setStyle(ButtonStyle.Link)
-                        .setURL('https://github.com/FricoSimon')
+                        .setURL('https://github.com/FricoSimon'),
+                    new ButtonBuilder()
+                        .setCustomId('testing button')
+                        .setLabel('GitHub')
+                        .setStyle(ButtonStyle.Secondary)
                 ),
             ],
         });
@@ -125,7 +128,24 @@ client.on('interactionCreate', async (interaction) => {
             );
 
         await interaction.showModal(modal);
+    } else if (interaction.commandName === 'truthordare') {
+        await interaction.reply({
+            content: 'Choose your destiny!',
+            components: [
+                new ActionRowBuilder().addComponents(
+                    new ButtonBuilder()
+                        .setCustomId('truth')
+                        .setLabel('Truth')
+                        .setStyle(ButtonStyle.Success),
+                    new ButtonBuilder()
+                        .setCustomId('dare')
+                        .setLabel('Dare')
+                        .setStyle(ButtonStyle.Danger)
+                ),
+            ],
+        });
     }
+
 });
 
 // listen for modal submissions
@@ -141,6 +161,18 @@ client.on('interactionCreate', async (interaction) => {
             ephemeral: true
         });
 
+    }
+});
+
+// listen for modal submissions
+client.on('interactionCreate', async (interaction) => {
+    if (!interaction.isButton()) return;
+
+    console.log(interaction.customId);
+    if (interaction.customId === 'testing button') {
+        await interaction.reply({
+            content: 'Button clicked!',
+        });
     }
 });
 
