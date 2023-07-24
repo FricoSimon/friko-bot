@@ -199,6 +199,27 @@ client.on('interactionCreate', async (interaction) => {
                 content: 'Error!',
             });
         }
+    } else if (interaction.customId === 'dare') {
+        try {
+            const response = await axios.get('https://api.truthordarebot.xyz/v1/dare');
+            const data = response.data.question;
+
+            const embedReply = new EmbedBuilder()
+                .setTitle('You chose dare!')
+                .setDescription('Do this dare:')
+                .addFields({ name: 'Order', value: `${data}`, inline: true })
+                .setColor('#FF5733');
+
+            await interaction.reply({
+                embeds: [embedReply],
+
+            });
+        } catch (error) {
+            console.error(error);
+            await interaction.reply({
+                content: 'Error!',
+            });
+        }
     }
 });
 
