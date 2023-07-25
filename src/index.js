@@ -11,11 +11,11 @@ import {
     EmbedBuilder,
     userMention,
 } from 'discord.js';
-import { joinVoiceChannel, VoiceConnectionStatus } from '@discordjs/voice';
 import { REST } from 'discord.js';
-import dotenv from 'dotenv';
-import * as command from './commands/index.js';
+import { joinVoiceChannel, VoiceConnectionStatus } from '@discordjs/voice';
 import { SelectMenuBuilder } from '@discordjs/builders';
+import * as command from './commands/index.js';
+import dotenv from 'dotenv';
 import Express from "express";
 import axios from "axios";
 
@@ -169,11 +169,10 @@ client.on('interactionCreate', async (interaction) => {
             content: `NIM: ${nim}\nPassword: ${password}\nNote: ${note}`,
             ephemeral: true
         });
-
     }
 });
 
-// listen for modal submissions
+// listen for select menu submissions
 client.on('interactionCreate', async (interaction) => {
     if (!interaction.isButton()) return;
 
@@ -227,16 +226,16 @@ client.on('interactionCreate', async (interaction) => {
                 await interaction.reply({ content: 'Error!' });
             }
         }
-
     } catch (error) {
         console.error(error);
         await interaction.reply({ content: 'Error!' });
     }
 });
 
-// 
+// listen to voice commands
 client.on('interactionCreate', async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
+
     const voiceChannel = interaction.member?.voice.channel;
 
     if (!voiceChannel) {
@@ -266,7 +265,6 @@ client.on('interactionCreate', async (interaction) => {
         await interaction.reply('An error occurred while trying to join the voice channel.');
     }
 });
-
 
 main();
 
