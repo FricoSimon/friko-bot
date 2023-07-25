@@ -11,6 +11,7 @@ import {
     EmbedBuilder,
     userMention,
 } from 'discord.js';
+import { joinVoiceChannel, VoiceConnectionStatus } from '@discordjs/voice';
 import { REST } from 'discord.js';
 import dotenv from 'dotenv';
 import * as command from './commands/index.js';
@@ -52,6 +53,7 @@ async function main() {
         command.semesterCommand,
         command.loginCommand,
         command.truthOrDareCommand,
+        command.joinVoiceCommand,
     ];
 
     try {
@@ -218,16 +220,53 @@ client.on('interactionCreate', async (interaction) => {
                     .setTimestamp();
 
                 await interaction.reply({ content: `Do this in 60s!\n${userId}`, embeds: [embedReply] });
+                // const dm = await interaction.user.send(data); // Send the DM    
+
             } catch (error) {
                 console.error(error);
                 await interaction.reply({ content: 'Error!' });
             }
         }
+
     } catch (error) {
         console.error(error);
         await interaction.reply({ content: 'Error!' });
     }
 });
+
+// 
+client.on('interactionCreate', async (interaction) => {
+    if (!interaction.isChatInputCommand()) return;
+    const voiceChannel = interaction.member?.voice.channel;
+
+    if (!voiceChannel) {
+        await interaction.reply('You need to be in a voice channel to use this command.');
+        return;
+    }
+
+    if (!voiceChannel.joinable) {
+        await interaction.reply('I do not have permission to join your voice channel.');
+        return;
+    }
+
+    try {
+        const connection = joinVoiceChannel({
+            channelId: voiceChannel.id,
+            guildId: voiceChannel.guild.id,
+            adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+        });
+
+        connection.on(VoiceConnectionStatus.Ready, () => {
+            console.log('The connection has entered the Ready state - ready to play audio!');
+        });
+
+        await interaction.reply(`Joined the voice channel ${voiceChannel.name}.`);
+    } catch (error) {
+        console.error('Error joining voice channel:', error);
+        await interaction.reply('An error occurred while trying to join the voice channel.');
+    }
+});
+
 
 main();
 
