@@ -12,9 +12,10 @@ import {
     userMention,
 } from 'discord.js';
 import { REST } from 'discord.js';
-import dotenv from 'dotenv';
-import * as command from './commands/index.js';
+import { joinVoiceChannel, createAudioPlayer, createAudioResource, NoSubscriberBehavior } from '@discordjs/voice';
 import { SelectMenuBuilder } from '@discordjs/builders';
+import * as command from './commands/index.js';
+import dotenv from 'dotenv';
 import Express from "express";
 import axios from "axios";
 
@@ -52,6 +53,8 @@ async function main() {
         command.semesterCommand,
         command.loginCommand,
         command.truthOrDareCommand,
+        command.joinVoiceCommand,
+        command.translateCommand
     ];
 
     try {
@@ -84,10 +87,6 @@ client.on('interactionCreate', async (interaction) => {
                             .setLabel('GitHub')
                             .setStyle(ButtonStyle.Link)
                             .setURL('https://github.com/FricoSimon'),
-                        new ButtonBuilder()
-                            .setCustomId('testing button')
-                            .setLabel('GitHub')
-                            .setStyle(ButtonStyle.Secondary)
                     ),
                 ],
             });
@@ -148,6 +147,58 @@ client.on('interactionCreate', async (interaction) => {
                     ),
                 ],
             });
+        } else if (interaction.commandName === 'voice') {
+            const voiceState = interaction.member?.voice;
+            const voiceChannel = voiceState?.channel;
+
+            if (!voiceChannel) {
+                console.log(`Member ${interaction.member.user.username} is not in a voice channel.`);
+                await interaction.reply('You are not in a voice channel.');
+                return; // Exit the function if the member is not in a voice channel
+            }
+
+            try {
+                const connection = joinVoiceChannel({
+                    channelId: voiceChannel.id,
+                    guildId: voiceChannel.guild.id,
+                    adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+                });
+
+                await interaction.reply(`Joined the voice channel ${voiceChannel.name}.`);
+
+                const player = createAudioPlayer({
+                    behaviors: {
+                        noSubscriber: NoSubscriberBehavior.Pause,
+                    },
+                });
+
+                const resource = createAudioResource('./music/gurenge.mp3', {
+                    metadata: {
+                        title: 'A good song!',
+                    },
+                });
+
+                // Start playing the music
+                player.play(resource);
+                connection.subscribe(player);
+
+                // Leave the voice channel after 60 seconds
+                setTimeout(() => {
+                    connection.destroy();
+                    console.log('Destroyed the connection');
+                }, 60000);
+
+            } catch (error) {
+                console.error('Error joining voice channel:', error);
+                await interaction.reply('An error occurred while trying to join the voice channel.');
+            }
+        } else if (interaction.commandName === 'translate') {
+            const actionRow = new ActionRowBuilder().addComponents(
+                new SelectMenuBuilder().setCustomId('translate_options').setOptions(
+                    { label: 'English to Indonesia', value: 'en' },
+                    { label: 'Indonesia to English', value: 'id' },
+                ));
+            await interaction.reply({ components: [actionRow] });
         }
     } catch (error) {
         console.error(error);
@@ -167,11 +218,33 @@ client.on('interactionCreate', async (interaction) => {
             content: `NIM: ${nim}\nPassword: ${password}\nNote: ${note}`,
             ephemeral: true
         });
+    } else if (interaction.customId === 'translate_modal') {
+        const translate = interaction.fields.getTextInputValue('translate');
+        const encodedParams = new URLSearchParams();
+        encodedParams.set('source_language', 'en');
+        encodedParams.set('target_language', 'id');
+        encodedParams.set('text', translate);
 
+        const options = {
+            method: 'POST',
+            url: 'https://text-translator2.p.rapidapi.com/translate',
+            headers: {
+                'content-type': 'application/x-www-form-urlencoded',
+                'X-RapidAPI-Key': process.env.rapidAPIKey,
+                'X-RapidAPI-Host': process.env.rapidAPIHost
+            },
+            data: encodedParams,
+        };
+
+        const response = await axios.request(options);
+        const translatedText = response.data.data.translatedText;
+        await interaction.reply({
+            content: `Translated Text: ${translatedText}`
+        });
     }
 });
 
-// listen for modal submissions
+// listen for select menu submissions
 client.on('interactionCreate', async (interaction) => {
     if (!interaction.isButton()) return;
 
@@ -218,9 +291,39 @@ client.on('interactionCreate', async (interaction) => {
                     .setTimestamp();
 
                 await interaction.reply({ content: `Do this in 60s!\n${userId}`, embeds: [embedReply] });
+                // const dm = await interaction.user.send(data); // Send the DM    
+
             } catch (error) {
                 console.error(error);
                 await interaction.reply({ content: 'Error!' });
+            }
+        }
+    } catch (error) {
+        console.error(error);
+        await interaction.reply({ content: 'Error!' });
+    }
+});
+
+client.on('interactionCreate', async (interaction) => {
+    if (!interaction.isButton && !interaction.isStringSelectMenu()) return;
+
+    try {
+        if (interaction.customId === 'translate_options') {
+            const value = interaction.values[0];
+            if (value === 'en') {
+                const modal = new ModalBuilder()
+                    .setTitle('translate')
+                    .setCustomId('translate_modal')
+                    .setComponents(
+                        new ActionRowBuilder().addComponents(
+                            new TextInputBuilder()
+                                .setLabel('translate')
+                                .setCustomId('translate')
+                                .setStyle(TextInputStyle.Paragraph)
+                        ));
+                await interaction.showModal(modal);
+            } else {
+
             }
         }
     } catch (error) {
