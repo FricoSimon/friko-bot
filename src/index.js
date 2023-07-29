@@ -240,6 +240,29 @@ client.on('interactionCreate', async (interaction) => {
         await interaction.reply({
             content: `Translated Text: ${translatedText}`
         });
+    } else if (interaction.customId === 'translate2_modal') {
+        const translate = interaction.fields.getTextInputValue('translate');
+        const encodedParams = new URLSearchParams();
+        encodedParams.set('source_language', 'id');
+        encodedParams.set('target_language', 'en');
+        encodedParams.set('text', translate);
+
+        const options = {
+            method: 'POST',
+            url: 'https://text-translator2.p.rapidapi.com/translate',
+            headers: {
+                'content-type': 'application/x-www-form-urlencoded',
+                'X-RapidAPI-Key': process.env.rapidAPIKey,
+                'X-RapidAPI-Host': process.env.rapidAPIHost
+            },
+            data: encodedParams,
+        };
+
+        const response = await axios.request(options);
+        const translatedText = response.data.data.translatedText;
+        await interaction.reply({
+            content: `Translated Text: ${translatedText}`
+        });
     }
 });
 
@@ -322,8 +345,21 @@ client.on('interactionCreate', async (interaction) => {
                         ));
                 await interaction.showModal(modal);
             } else {
-
-            }
+                const value = interaction.values[0];
+                if (value === 'id') {
+                    const modal = new ModalBuilder()
+                        .setTitle('translate')
+                        .setCustomId('translate2_modal')
+                        .setComponents(
+                            new ActionRowBuilder().addComponents(
+                                new TextInputBuilder()
+                                    .setLabel('translate')
+                                    .setCustomId('translate')
+                                    .setStyle(TextInputStyle.Paragraph)
+                            ));
+                    await interaction.showModal(modal);
+                }
+            };
         }
     } catch (error) {
         console.error(error);
