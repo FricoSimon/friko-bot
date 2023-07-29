@@ -53,7 +53,6 @@ async function main() {
         command.semesterCommand,
         command.loginCommand,
         command.truthOrDareCommand,
-        command.joinVoiceCommand,
         command.translateCommand
     ];
 
