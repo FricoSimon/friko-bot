@@ -199,6 +199,47 @@ client.on('interactionCreate', async (interaction) => {
                     { label: 'Indonesia to English', value: 'id' },
                 ));
             await interaction.reply({ components: [actionRow] });
+        } else if (interaction.commandName === 'dadjokes') {
+            const options = {
+                method: 'GET',
+                url: 'https://dad-jokes.p.rapidapi.com/random/joke',
+                headers: {
+                    'X-RapidAPI-Key': process.env.rapidAPIKey_Dadjokes,
+                    'X-RapidAPI-Host': process.env.rapidAPIHost_Dadjokes
+                }
+            };
+
+            try {
+                const response = await axios.request(options);
+                const jokeSetup = response.data.body[0].setup;
+                const jokePunchline = response.data.body[0].punchline;
+                const username = interaction.user.username;
+
+                const embedReply = new EmbedBuilder()
+                    .setTitle('Dad Jokes')
+                    .setAuthor({ name: `${username}` })
+                    .setThumbnail('https://i.imgur.com/mKX4m6s.png')
+                    .addFields({ name: 'Question', value: `${jokeSetup}`, inline: false })
+                    .addFields({ name: 'Answer', value: `${jokePunchline}`, inline: false })
+                    .setColor('#3ba55c')
+                    .setTimestamp();
+
+                const responses = [
+                    "Hahaha",
+                    "LOL",
+                    "That's funny!",
+                    "I can't stop laughing!",
+                    "Good one!",
+                    "LMAO!",
+                    "XD"
+                ];
+
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+
+                await interaction.reply({ content: randomResponse, embeds: [embedReply] });
+            } catch (error) {
+                console.error(error);
+            }
         }
     } catch (error) {
         console.error(error);
@@ -230,8 +271,8 @@ client.on('interactionCreate', async (interaction) => {
             url: 'https://text-translator2.p.rapidapi.com/translate',
             headers: {
                 'content-type': 'application/x-www-form-urlencoded',
-                'X-RapidAPI-Key': process.env.rapidAPIKey,
-                'X-RapidAPI-Host': process.env.rapidAPIHost
+                'X-RapidAPI-Key': process.env.rapidAPIKey_Translate,
+                'X-RapidAPI-Host': process.env.rapidAPIHost_Translate
             },
             data: encodedParams,
         };
@@ -272,7 +313,6 @@ client.on('interactionCreate', async (interaction) => {
     if (!interaction.isButton()) return;
 
     try {
-        // truth button handler
         if (interaction.customId === 'truth') {
             try {
                 const response = await axios.get('https://api.truthordarebot.xyz/v1/truth');
@@ -327,6 +367,7 @@ client.on('interactionCreate', async (interaction) => {
     }
 });
 
+// listen for select menu submissions then return modal
 client.on('interactionCreate', async (interaction) => {
     if (!interaction.isButton && !interaction.isStringSelectMenu()) return;
 
