@@ -53,7 +53,8 @@ async function main() {
         command.semesterCommand,
         command.loginCommand,
         command.truthOrDareCommand,
-        command.translateCommand
+        command.translateCommand,
+        command.dadJokesCommand
     ];
 
     try {
