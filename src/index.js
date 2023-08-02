@@ -53,7 +53,8 @@ async function main() {
         command.loginCommand,
         command.truthOrDareCommand,
         command.translateCommand,
-        command.dadJokesCommand
+        command.dadJokesCommand,
+        command.scheduleCommand,
     ];
 
     try {
@@ -93,9 +94,9 @@ client.on('interactionCreate', async (interaction) => {
             const name = interaction.options.getString('name');
             const nim = interaction.options.getInteger('nim');
             const batch = interaction.options.getInteger('batch');
-            const channel = interaction.options.getChannel('channel');
+
             await interaction.reply(
-                `Hi ${nim} - ${name}! You have been registered as a student/alumni of SI ITHB ${batch}.`
+                `hi ${name} - ${nim}! You have been registered as a student/alumni of SI ITHB ${batch}.`
             );
         } else if (interaction.commandName === 'semester') {
             const actionRow = new ActionRowBuilder().addComponents(
@@ -240,6 +241,18 @@ client.on('interactionCreate', async (interaction) => {
             } catch (error) {
                 console.error(error);
             }
+        } else if (interaction.commandName === 'schedule') {
+            const message = interaction.options.getString('message');
+            const time = interaction.options.getInteger('time');
+            const channel = interaction.options.getChannel('channel');
+            const date = new Date(new Date().getTime() + time)
+
+            schedule.scheduleJob(date, async () => {
+                await channel.send({ content: message });
+            });
+            await interaction.reply(
+                `Your message will be sent to ${channel} in ${date.toTimeString()}`
+            );
         }
     } catch (error) {
         console.error(error);
