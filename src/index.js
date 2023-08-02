@@ -10,7 +10,6 @@ import {
     ButtonStyle,
     EmbedBuilder,
     userMention,
-    ChannelType,
 } from 'discord.js';
 import { REST } from 'discord.js';
 import { joinVoiceChannel, createAudioPlayer, createAudioResource, NoSubscriberBehavior } from '@discordjs/voice';
@@ -19,6 +18,7 @@ import * as command from './commands/index.js';
 import dotenv from 'dotenv';
 import Express from "express";
 import axios from "axios";
+import schedule from "node-schedule";
 
 const app = new Express();
 const port = 3000;
