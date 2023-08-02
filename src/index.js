@@ -10,6 +10,8 @@ import {
     ButtonStyle,
     EmbedBuilder,
     userMention,
+    ActivityType,
+    Status
 } from 'discord.js';
 import { REST } from 'discord.js';
 import { joinVoiceChannel, createAudioPlayer, createAudioResource, NoSubscriberBehavior } from '@discordjs/voice';
@@ -40,7 +42,15 @@ const client = new Client({
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
 // Log when bot is ready
-client.on('ready', () => { console.log(`Logged in as ${client.user.tag} successfully!`); });
+client.on('ready', () => {
+    console.log(`Logged in as ${client.user.tag}`);
+
+    // Set the bot's presence
+    client.user.setPresence({
+        activities: [{ name: 'VS Code', type: ActivityType.Playing }],
+        status: 'online',
+    });
+});
 
 // main function
 async function main() {
