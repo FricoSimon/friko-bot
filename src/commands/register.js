@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, } from 'discord.js';
+import { ChannelType, SlashCommandBuilder, } from 'discord.js';
 
 const registerCommand = new SlashCommandBuilder()
     .setName('register')
@@ -23,6 +23,14 @@ const registerCommand = new SlashCommandBuilder()
                 { name: '2021', value: 2021 },
                 { name: '2022', value: 2022 },
             )
+    )
+    .addChannelOption((option) =>
+        option
+            .setName('channel')
+            .setDescription('The channel to send the message to')
+            .addChannelTypes(ChannelType.GuildText)
+            .setRequired(true)
     );
+
 
 export default registerCommand.toJSON();

@@ -10,6 +10,7 @@ import {
     ButtonStyle,
     EmbedBuilder,
     userMention,
+    ChannelType,
 } from 'discord.js';
 import { REST } from 'discord.js';
 import { joinVoiceChannel, createAudioPlayer, createAudioResource, NoSubscriberBehavior } from '@discordjs/voice';
@@ -39,9 +40,7 @@ const client = new Client({
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
 // Log when bot is ready
-client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag} successfully!`);
-});
+client.on('ready', () => { console.log(`Logged in as ${client.user.tag} successfully!`); });
 
 // main function
 async function main() {
@@ -94,6 +93,7 @@ client.on('interactionCreate', async (interaction) => {
             const name = interaction.options.getString('name');
             const nim = interaction.options.getInteger('nim');
             const batch = interaction.options.getInteger('batch');
+            const channel = interaction.options.getChannel('channel');
             await interaction.reply(
                 `Hi ${nim} - ${name}! You have been registered as a student/alumni of SI ITHB ${batch}.`
             );
